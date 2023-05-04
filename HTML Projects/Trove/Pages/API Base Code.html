@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>API MAIN CODE</title>
+  </head>
+  <body>
+    <input type="text" id="book-input">
+    <button id="search-button">Search</button>
+    <ul id="results-list"></ul>
+
+    <script>
+      const API_KEY = 'AIzaSyBNJuAKBcbbirzmQgzrJQntdSQKxTTM72M';
+
+async function searchBooks(query) {
+  const url = `https://www.googleapis.com/books/v1/volumes?key=${API_KEY}&q=${encodeURIComponent(query)}`;
+  const response = await fetch(url);
+  const data = await response.json();
+  return data.items;
+}
+
+
+const bookInput = document.getElementById('book-input');
+const searchButton = document.getElementById('search-button');
+const resultsList = document.getElementById('results-list');
+
+searchButton.addEventListener('click', async () => {
+  const query = bookInput.value;
+  const books = await searchBooks(query);
+  displayResults(books);
+});
+
+
+function displayResults(books) {
+  resultsList.innerHTML = '';
+  for (const book of books) {
+    const rating = book.volumeInfo.averageRating ?? 'N/A';
+    const li = document.createElement('li');
+    li.innerHTML = `
+      <img src="${book.volumeInfo.imageLinks?.thumbnail ?? 'https://via.placeholder.com/128x192.png?text=No+Image'}">
+      <div>
+        <h3>${book.volumeInfo.title}</h3>
+        <p>By ${book.volumeInfo.authors?.join(', ')}</p>
+        <p>Rating: ${rating}</p>
+      </div>
+    ` ;
+    resultsList.appendChild(li);
+  }
+}
+    </script>
+  </body>
+</html>
